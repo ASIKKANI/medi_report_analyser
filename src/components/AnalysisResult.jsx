@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { generateOllamaResponse } from '../services/ollama';
 import { RefreshCw, AlertTriangle, FileText, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { useVoice } from '../context/VoiceContext';
+import HealthDashboard from './HealthDashboard';
 
 const AnalysisResult = ({ text, analysis, setAnalysis, settings }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const { speak, autoNarrate } = useVoice();
 
     const analyze = async () => {
         if (!text || !settings.ollamaModel) return;
@@ -15,26 +19,13 @@ const AnalysisResult = ({ text, analysis, setAnalysis, settings }) => {
         try {
             // Prompt Engineering for Medical Report
             const prompt = `
-        You are a friendly and empathetic medical assistant. 
-        Analyze the following medical report and explain it clearly for a patient.
-        
-        Please format your response using Markdown with the following structure:
-
-        # 🏥 Report Summary
-        [A brief, 1-2 sentence summary of what this report is about]
-
-        # 🔍 Key Findings
-        - **[Finding Name]**: [Value/Observation] - *[Simple explanation of what this means]*
-        - **[Finding Name]**: [Value/Observation] - *[Simple explanation]*
-        
-        # 💡 Simplified Explanation
-        [Explain any medical jargon or complex terms found in the report in plain English.]
-
-        # 🍀 Healthy Recommendations
-        > [Actionable tip 1 based on findings]
-        > [Actionable tip 2 based on findings]
-
-        *Disclaimer: I am an AI assistant and this is not a substitute for professional medical advice. Always consult your doctor.*
+        You are a helpful medical assistant. 
+        Analyze the following medical report text and explain it in simple, easy-to-understand language for a patient.
+        Break it down into:
+        1. **Summary**: What is this report about?
+        2. **Key Findings**: Important values or observations.
+        3. **Simplified Explanation**: Explain any medical jargon.
+        4. **Recommendations**: General healthy lifestyle tips relevant to these findings (add a disclaimer).
 
         Report Text:
         "${text}"
@@ -54,6 +45,15 @@ const AnalysisResult = ({ text, analysis, setAnalysis, settings }) => {
             analyze();
         }
     }, [text]);
+
+    // Auto-narrate when analysis is ready
+    useEffect(() => {
+        if (analysis && autoNarrate) {
+            setTimeout(() => {
+                speak("Your medical report analysis is ready. Here's what I found: " + analysis.substring(0, 500), true);
+            }, 500);
+        }
+    }, [analysis]);
 
     return (
         <div className="glass-panel" style={{ padding: '2rem', height: '600px', overflowY: 'auto' }}>
@@ -90,9 +90,12 @@ const AnalysisResult = ({ text, analysis, setAnalysis, settings }) => {
             )}
 
             {analysis && !loading && (
-                <div className="markdown-content">
-                    <ReactMarkdown>{analysis}</ReactMarkdown>
-                </div>
+                <>
+                    <div className="markdown-content">
+                        <ReactMarkdown>{analysis}</ReactMarkdown>
+                    </div>
+                    <HealthDashboard analysis={analysis} />
+                </>
             )}
 
             {!analysis && !loading && !error && (

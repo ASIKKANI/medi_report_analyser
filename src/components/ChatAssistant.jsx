@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, Mic, MicOff, Volume2, Sparkles, User, Bot, VolumeX } from 'lucide-react';
 import { generateGeminiResponse } from '../services/gemini';
 import ReactMarkdown from 'react-markdown';
+import { useVoiceCommand } from '../context/VoiceCommandContext';
+import { useVoice } from '../context/VoiceContext';
 
 const ChatAssistant = ({ context, analysis, settings }) => {
     const [messages, setMessages] = useState([
@@ -12,6 +14,8 @@ const ChatAssistant = ({ context, analysis, settings }) => {
     const [listening, setListening] = useState(false);
     const [speaking, setSpeaking] = useState(false);
     const messagesEndRef = useRef(null);
+    const { registerCommandHandler, unregisterCommandHandler } = useVoiceCommand();
+    const { speak } = useVoice();
 
     // Scroll to bottom
     useEffect(() => {
@@ -71,10 +75,16 @@ const ChatAssistant = ({ context, analysis, settings }) => {
         window.speechSynthesis.speak(utterance);
     };
 
-    const handleSend = async () => {
-        if (!input.trim() || !settings.geminiKey) return;
+    const handleSend = async (questionText = null) => {
+        const questionToSend = questionText || input;
+        if (!questionToSend.trim() || !settings.geminiKey) {
+            if (!settings.geminiKey) {
+                speak('Please configure your Gemini API key in settings first', true);
+            }
+            return;
+        }
 
-        const userMsg = { role: 'user', content: input };
+        const userMsg = { role: 'user', content: questionToSend };
         setMessages(prev => [...prev, userMsg]);
         setInput('');
         setLoading(true);
@@ -85,7 +95,7 @@ const ChatAssistant = ({ context, analysis, settings }) => {
         Context (Medical Report Content): "${context.substring(0, 1000)}..."
         Previous Analysis: "${analysis ? analysis.substring(0, 500) : ''}..."
         
-        User Question: ${input}
+        User Question: ${questionToSend}
         
         Answer the user's question safely and helpfully based on the report context. 
         If it's a medical advice request, advise consulting a doctor.
@@ -99,12 +109,37 @@ const ChatAssistant = ({ context, analysis, settings }) => {
             );
 
             setMessages(prev => [...prev, { role: 'model', content: responseText }]);
+            speak('I have an answer for you', true);
         } catch (err) {
-            setMessages(prev => [...prev, { role: 'model', content: "Error: " + err.message }]);
+            const errorMsg = "Error: " + err.message;
+            setMessages(prev => [...prev, { role: 'model', content: errorMsg }]);
+            speak('Sorry, there was an error processing your question', true);
         } finally {
             setLoading(false);
         }
     };
+
+    // Register voice command handlers
+    useEffect(() => {
+        registerCommandHandler('chat', (params) => {
+            if (params.query) {
+                speak(`Asking about ${params.query}`, true);
+                handleSend(params.query);
+            }
+        });
+
+        registerCommandHandler('ask', (params) => {
+            if (params.query) {
+                speak(`Asking: ${params.query}`, true);
+                handleSend(params.query);
+            }
+        });
+
+        return () => {
+            unregisterCommandHandler('chat');
+            unregisterCommandHandler('ask');
+        };
+    }, [registerCommandHandler, unregisterCommandHandler, context, analysis, settings, speak]);
 
     return (
         <div className="glass-panel" style={{ padding: '0', display: 'flex', flexDirection: 'column', height: '600px', overflow: 'hidden' }}>

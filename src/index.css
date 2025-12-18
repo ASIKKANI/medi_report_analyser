@@ -68,10 +68,6 @@ button {
   padding: 0 2rem;
 }
 
-.grid-cols-2 {
-  grid-template-columns: 1fr 1fr;
-}
-
 .glass-panel {
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
@@ -126,69 +122,106 @@ button {
   }
 }
 
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out forwards;
 }
 
-/* Responsiveness */
-@media (max-width: 768px) {
-  .app-layout {
-    padding: 1rem;
-  }
-
-  .container {
-    padding: 0 1rem;
-  }
-
-  /* Force grid columns to stack on mobile */
-  .grid-cols-2 {
-    grid-template-columns: 1fr !important;
-  }
-
-  h1 {
-    font-size: 2.5rem !important;
-  }
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
-/* Markdown Styling for Patient Friendliness */
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Markdown content styling */
 .markdown-content {
   line-height: 1.8;
-  color: #e2e8f0;
 }
 
 .markdown-content h1,
 .markdown-content h2,
 .markdown-content h3 {
-  color: var(--color-primary);
   margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-content p {
+  margin-bottom: 1rem;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-left: 1.5rem;
   margin-bottom: 1rem;
 }
 
 .markdown-content strong {
-  color: var(--color-accent);
+  color: var(--color-primary);
   font-weight: 600;
 }
 
-.markdown-content ul {
-  list-style-type: none;
-  padding: 0;
-  display: grid;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.markdown-content li {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1rem;
-  border-radius: 12px;
-  border-left: 3px solid var(--color-secondary);
-}
-
-.markdown-content blockquote {
-  background: rgba(45, 212, 191, 0.1);
-  border-left: 4px solid var(--color-accent);
-  margin: 1.5rem 0;
-  padding: 1rem;
-  border-radius: 0 12px 12px 0;
-  font-style: italic;
+.markdown-content code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
 }
