@@ -23,6 +23,10 @@
  * https://asikkani.github.io/medi_report_analyser/ (preferable)
  * https://mediscanai-git-main-asikkanis-projects.vercel.app/
 ---
+## Demo Video
+ https://drive.google.com/drive/folders/1Y9z4DoQXbMcrfVDMf8JV2ybiMV3ppc0w?usp=sharing
+
+---
 
 ## 👥 Team RADIOHEADS
 
