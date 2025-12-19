@@ -1,10 +1,3 @@
-Alright. I’ll generate a **full README in the same spirit, depth, and structure** as the ThreatShield one, but tailored to **your Medical Analyzer**.
-You can directly paste this into GitHub. I’ll keep it **serious, competitive, and product-grade**.
-
-You can rename anything later.
-
----
-
 # 🧠 MediScan AI – Privacy-First Medical Report Intelligence Platform
 
 # DATAQUEST / Hackathon Edition
@@ -24,6 +17,11 @@ You can rename anything later.
 
 </div>
 
+---
+
+## Deployment Links
+ * https://asikkani.github.io/medi_report_analyser/
+ * https://mediscanai-git-main-asikkanis-projects.vercel.app/
 ---
 
 ## 👥 Team <YOUR_TEAM_NAME>
@@ -250,23 +248,6 @@ npm run dev
 * Clinics needing patient-friendly summaries
 * Privacy-conscious individuals
 
----
-
-## 🔮 Roadmap
-
-### Phase 2
-
-* Multilingual voice narration
-* Clinical guideline mapping
-* Caregiver access mode
-
-### Phase 3
-
-* Federated learning (privacy-safe)
-* Doctor-ready summaries
-* Device-agnostic deployment
-
----
 
 ## 🏆 Innovation Highlights
 
@@ -291,12 +272,3 @@ npm run dev
 > **— Team <YOUR_TEAM_NAME>**
 
 ---
-
-If you want next, I can:
-
-* Add **API docs section**
-* Add **evaluation metrics**
-* Tune this to sound **more clinical or more startup**
-* Strip it down for a **hackathon-only README**
-
-Just tell me which direction.
