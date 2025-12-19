@@ -20,7 +20,7 @@
 ---
 
 ## Deployment Links
- * https://asikkani.github.io/medi_report_analyser/
+ * https://asikkani.github.io/medi_report_analyser/ (preferable)
  * https://mediscanai-git-main-asikkanis-projects.vercel.app/
 ---
 
@@ -243,8 +243,6 @@ npm run dev
 
 <div align="center">
 
-<img src="./images/demo.gif" width="900"/>
-
 <img src="./images/10.jpg" width="800"/>
 
 <img src="./images/7.jpg" width="800"/>
@@ -254,9 +252,6 @@ npm run dev
 <img src="./images/5.jpg" width="800"/>
 
 </div>
----
-
-
 
 ---
 
