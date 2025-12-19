@@ -29,9 +29,9 @@
 <table align="center">
 <tr>
 <td align="center"><img src="https://img.shields.io/badge/-Yeswanth%20Ram-6C5CE7?style=for-the-badge&logo=github&logoColor=white"></td>
-<td align="center"><img src="https://img.shields.io/badge/-BharaniDharan%202-00CEC9?style=for-the-badge&logo=github&logoColor=white"></td>
-<td align="center"><img src="https://img.shields.io/badge/-AsikKani%203-FDCB6E?style=for-the-badge&logo=github&logoColor=white"></td>
-<td align="center"><img src="https://img.shields.io/badge/-Logesh%204-FF7675?style=for-the-badge&logo=github&logoColor=white"></td>
+<td align="center"><img src="https://img.shields.io/badge/-BharaniDharan%20-00CEC9?style=for-the-badge&logo=github&logoColor=white"></td>
+<td align="center"><img src="https://img.shields.io/badge/-AsikKani%20-FDCB6E?style=for-the-badge&logo=github&logoColor=white"></td>
+<td align="center"><img src="https://img.shields.io/badge/-Logesh%20-FF7675?style=for-the-badge&logo=github&logoColor=white"></td>
 </tr>
 </table>
 
