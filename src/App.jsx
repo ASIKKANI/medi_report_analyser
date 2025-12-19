@@ -39,7 +39,7 @@ function AppContent() {
   const [settings, setSettings] = useState({
     geminiKey: '',
     ollamaModel: 'llama3',
-    ollamaUrl: 'http://localhost:11434'
+    ollamaUrl: 'http://172.16.45.105:11434'
   });
 
   // Fetch reports on login
