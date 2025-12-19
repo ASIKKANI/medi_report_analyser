@@ -4,6 +4,14 @@
 
 ---
 
+## ⚡ Live Demo
+
+🚀 **Vercel**: [mediscanai-git-main-asikkanis-projects.vercel.app](https://mediscanai-git-main-asikkanis-projects.vercel.app)
+🌐 **GitHub Pages**: [asikkani.github.io/medi_report_analyser](https://asikkani.github.io/medi_report_analyser/)
+📈 **Project Presentation**: [Coming Soon]
+
+---
+
 ## ✨ WOW Features
 
 ### 🧠 Multi-modal AI Intelligence
