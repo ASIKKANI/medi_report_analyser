@@ -243,7 +243,7 @@ npm run dev
 
 <div align="center">
 
-<img src="./images/demo.mp4" width="900"/>
+<img src="./images/demo.gif" width="900"/>
 
 <img src="./images/10.jpg" width="800"/>
 
