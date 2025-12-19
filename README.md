@@ -24,14 +24,14 @@
  * https://mediscanai-git-main-asikkanis-projects.vercel.app/
 ---
 
-## 👥 Team <YOUR_TEAM_NAME>
+## 👥 Team RADIOHEADS
 
 <table align="center">
 <tr>
 <td align="center"><img src="https://img.shields.io/badge/-Yeswanth%20Ram-6C5CE7?style=for-the-badge&logo=github&logoColor=white"></td>
-<td align="center"><img src="https://img.shields.io/badge/-Member%202-00CEC9?style=for-the-badge&logo=github&logoColor=white"></td>
-<td align="center"><img src="https://img.shields.io/badge/-Member%203-FDCB6E?style=for-the-badge&logo=github&logoColor=white"></td>
-<td align="center"><img src="https://img.shields.io/badge/-Member%204-FF7675?style=for-the-badge&logo=github&logoColor=white"></td>
+<td align="center"><img src="https://img.shields.io/badge/-BharaniDharan%202-00CEC9?style=for-the-badge&logo=github&logoColor=white"></td>
+<td align="center"><img src="https://img.shields.io/badge/-AsikKani%203-FDCB6E?style=for-the-badge&logo=github&logoColor=white"></td>
+<td align="center"><img src="https://img.shields.io/badge/-Logesh%204-FF7675?style=for-the-badge&logo=github&logoColor=white"></td>
 </tr>
 </table>
 
@@ -269,6 +269,6 @@ npm run dev
 ---
 
 > *“Healthcare intelligence should be understandable, inclusive, and private by default.”*
-> **— Team <YOUR_TEAM_NAME>**
+> **— Team RADIOHEADS**
 
 ---
