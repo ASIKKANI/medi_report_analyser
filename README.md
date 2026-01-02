@@ -60,6 +60,7 @@ MediScan AI is a **privacy-first, accessibility-driven medical report intelligen
 
 It works **with or without the cloud**, supports **voice-only navigation**, and is designed so **blind and elderly users can use it independently**.
 
+
 <div align="center">
 
 ```mermaid
