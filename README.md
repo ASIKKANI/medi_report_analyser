@@ -19,7 +19,7 @@
 
 ---
 
-## Deployment Links
+## Deployment Links 
  * https://asikkani.github.io/medi_report_analyser/ (preferable)
  * https://mediscanai-git-main-asikkanis-projects.vercel.app/
 ---
