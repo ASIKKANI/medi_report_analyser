@@ -10,11 +10,12 @@ import {
     limit
 } from 'firebase/firestore';
 
-export const saveReport = async (userId, structuredData, rawText) => {
+export const saveReport = async (userId, structuredData, rawText, ocrConfidence) => {
     try {
         const docRef = await addDoc(collection(db, `users/${userId}/reports`), {
             ...structuredData,
             rawText,
+            ocrConfidence,
             timestamp: serverTimestamp(),
             createdAt: new Date().toISOString()
         });

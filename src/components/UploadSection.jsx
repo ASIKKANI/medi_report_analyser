@@ -25,7 +25,7 @@ const UploadSection = ({ onFileProocessed }) => {
             const result = await extractTextFromImage(file, (p) => setProgress(Math.round(p * 100)));
             const extractedText = result.text;
             console.log("Extracted Text:", extractedText); // Debug
-            onFileProocessed(extractedText, file);
+            onFileProocessed(extractedText, file, result.confidence);
             speak('Report uploaded successfully. Analysis is ready.', true);
         } catch (err) {
             alert("Error processing file: " + err.message);

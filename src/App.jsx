@@ -32,6 +32,7 @@ function AppContent() {
   const [latestStructuredData, setLatestStructuredData] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [ocrConfidence, setOcrConfidence] = useState(null);
   const { registerCommandHandler, unregisterCommandHandler } = useVoiceCommand();
   const { user } = useAuth();
 
@@ -39,7 +40,7 @@ function AppContent() {
   const [settings, setSettings] = useState({
     geminiKey: '',
     ollamaModel: 'llama3',
-    ollamaUrl: 'http://172.16.45.105:11434'
+    ollamaUrl: 'http://localhost:11434'
   });
 
   // Fetch reports on login
@@ -60,10 +61,11 @@ function AppContent() {
   }, [user]);
 
   // Handle new report processing
-  const handleFileUpload = async (text, fileObj) => {
-    console.log("📁 handleFileUpload triggered");
+  const handleFileUpload = async (text, fileObj, confidence) => {
+    console.log("📁 handleFileUpload triggered", { confidence });
     setFile(fileObj);
     setExtractedText(text);
+    setOcrConfidence(confidence);
 
     let structured = null;
     try {
@@ -76,7 +78,7 @@ function AppContent() {
       if (structured) {
         setLatestStructuredData(structured);
         if (user) {
-          await saveReport(user.uid, structured, text);
+          await saveReport(user.uid, structured, text, confidence);
           const updated = await getUserReports(user.uid);
           setReports(updated);
         }
@@ -149,6 +151,7 @@ function AppContent() {
                       settings={settings}
                       structuredData={latestStructuredData}
                       reports={reports || []}
+                      ocrConfidence={ocrConfidence}
                     />
                   )}
                   <TrendDashboard reports={reports} />
@@ -158,7 +161,7 @@ function AppContent() {
                   <HealthBodyDiagram metrics={latestStructuredData?.metrics} />
 
                   {extractedText && (
-                    <ChatAssistant context={extractedText} analysis={analysis} settings={settings} />
+                    <ChatAssistant context={extractedText} analysis={analysis} settings={settings} reports={reports} />
                   )}
                 </div>
               </div>

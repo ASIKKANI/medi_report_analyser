@@ -4,7 +4,7 @@ export const generateGeminiResponse = async (apiKey, history, message, context, 
     if (!apiKey) throw new Error("Gemini API Key is missing. Please add it in settings.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const chat = model.startChat({
         history: history.map(h => ({
@@ -27,20 +27,23 @@ export const extractStructuredData = async (apiKey, reportText) => {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash",
         generationConfig: { responseMimeType: "application/json" }
     });
 
     const prompt = `
-        You are a medical data extractor and analyzer.
+        UNIFIED MEDICAL INTELLIGENCE WORKFLOW - Phase 1 & 2
+        You are a medical data extractor and longitudinal health analyzer.
         
-        STRICT MEDICAL RULES:
-        1. GUIDELINES: Anchor all interpretations to these standards: ${JSON.stringify(MEDICAL_CONSTANTS.GUIDELINES)}.
-        2. CONFIDENCE: For every extracted value, assign a confidence level ("High", "Medium", "Low").
+        STRICT CLINICAL RULES:
+        1. EVIDENCE ANCHORING: Anchor all interpretations (status/explanation) to ${JSON.stringify(MEDICAL_CONSTANTS.GUIDELINES)}. Specifically reference WHO, ADA, or ICMR in explanations.
+        2. CONFIDENCE SYSTEM: For every extracted value, assign a confidence level ("High", "Medium", "Low").
            - "High": >90% clarity (text is perfect).
            - "Medium": 70-90% clarity (minor typos/ambiguity).
            - "Low": <70% clarity (inferred or blurry).
-        3. SAFETY: ${MEDICAL_CONSTANTS.ADVICE_BLOCKER_PROMPT}
+        3. BODY-SYSTEM CORRELATION: Identify links between markers (e.g. Glucose + Lipids for Metabolic risk).
+        4. DAILY-LIFE TRANSLATION: For abnormal values, translate clinical jargon into real-world impacts (e.g. Hemoglobin -> Fatigue).
+        5. SAFETY GUARDRAILS: ${MEDICAL_CONSTANTS.ADVICE_BLOCKER_PROMPT}
 
         Extract numerical values and return this EXACT JSON structure.
         For every metric, output an object: { "value": number, "unit": string, "confidence": "High" | "Medium" | "Low", "status": "Normal" | "High" | "Low" | "Critical", "explanation": "Why this is normal/abnormal based on guidelines" }

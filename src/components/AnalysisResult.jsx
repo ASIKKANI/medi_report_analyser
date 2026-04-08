@@ -47,7 +47,7 @@ const markdownStyles = `
     }
 `;
 
-const AnalysisResult = ({ text, analysis, setAnalysis, settings, structuredData, reports }) => {
+const AnalysisResult = ({ text, analysis, setAnalysis, settings, structuredData, reports, ocrConfidence }) => {
     const { t, getAILanguageInstruction } = useLanguage();
     const [activeTab, setActiveTab] = useState('simple');
     const [loading, setLoading] = useState(false);
@@ -59,12 +59,25 @@ const AnalysisResult = ({ text, analysis, setAnalysis, settings, structuredData,
         detailed: '',
         changes: ''
     });
-    const { speak, autoNarrate } = useVoice();
+    const { speak } = useVoice();
 
     const handleExport = async () => {
         const element = document.getElementById('analysis-panel');
         if (!element) return;
-        const canvas = await html2canvas(element, { backgroundColor: '#0f172a' });
+
+        // Add clinical disclaimer temporarily for PDF
+        const disclaimer = document.createElement('div');
+        disclaimer.style.padding = '1rem';
+        disclaimer.style.fontSize = '0.7rem';
+        disclaimer.style.color = '#94a3b8';
+        disclaimer.style.borderTop = '1px solid #334155';
+        disclaimer.style.marginTop = '2rem';
+        disclaimer.innerText = "GOVERNANCE-READY REPORT: This analysis references WHO/ADA guidelines. It is not a medical diagnosis. Share this structured intelligence with your clinician for consultation.";
+        element.appendChild(disclaimer);
+
+        const canvas = await html2canvas(element, { backgroundColor: '#0f172a', scale: 2 });
+        element.removeChild(disclaimer); // Clean up
+
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         const imgProps = pdf.getImageProperties(imgData);
@@ -72,9 +85,8 @@ const AnalysisResult = ({ text, analysis, setAnalysis, settings, structuredData,
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
-        // Manual Blob Export to bypass browser hash naming
         const pdfBlob = pdf.output('blob');
-        const fileName = `medical_analysis_${new Date().toISOString().split('T')[0]}.pdf`;
+        const fileName = `medical_intelligence_${new Date().toISOString().split('T')[0]}.pdf`;
         const url = URL.createObjectURL(pdfBlob);
         const link = document.createElement('a');
         link.href = url;
@@ -96,20 +108,19 @@ const AnalysisResult = ({ text, analysis, setAnalysis, settings, structuredData,
         setError(null);
 
         const promptConfigs = {
-            brief: "Provide a 1-2 sentence high-level summary. Focus on the core takeaway. Ultra-concise.",
-            simple: "Explain findings in simple, non-technical language. Use 3-4 bullet points. Focus on lifestyle impact.",
-            detailed: "Provide a deep clinical analysis. Briefly explain biological significance and key correlations."
+            brief: "Phase 3 Goal: Provide a high-level evidence-anchored summary citing the core health takeaway based on guidelines.",
+            simple: "Phase 3 Goal: Translate clinical jargon into plain language. Explain WHY values are flagged and how they impact daily-life (e.g. energy/fatigue).",
+            detailed: "Phase 4 Goal: Perform longitudinal correlation analysis. Link body systems (e.g. Metabolic-Cardiac) and anchor every finding to WHO/ADA evidence."
         };
 
         const modes = ['brief', 'simple', 'detailed', 'changes'];
         const promises = modes.map(async (mode) => {
             if (modeAnalyses[mode]) return;
 
-            // For changes, check if we have a previous report
             if (mode === 'changes') {
-                const prevMetrics = reports?.length > 1 ? reports[1].metrics : null;
+                const prevMetrics = reports?.length > 1 ? (reports[0]?.date === structuredData?.date ? reports[1].metrics : reports[0].metrics) : null;
                 if (!prevMetrics) {
-                    setModeAnalyses(prev => ({ ...prev, changes: "No previous records found for comparison." }));
+                    setModeAnalyses(prev => ({ ...prev, changes: "Baseline Normalization: No previous records found to establish current health trajectory." }));
                     return;
                 }
             }
@@ -119,14 +130,14 @@ const AnalysisResult = ({ text, analysis, setAnalysis, settings, structuredData,
             try {
                 let prompt = "";
                 if (mode === 'changes') {
-                    const prevMetrics = reports?.length > 1 ? reports[1].metrics : null;
-                    prompt = `Briefly compare these health metrics and identify improvements or failures:
-CURRENT: HbA1c=${structuredData.metrics?.blood?.hba1c}, Cholesterol=${structuredData.metrics?.cholesterol?.total}, BP=${structuredData.metrics?.heart?.bp_sys}/${structuredData.metrics?.heart?.bp_dia}
-PREVIOUS: HbA1c=${prevMetrics?.blood?.hba1c}, Cholesterol=${prevMetrics?.cholesterol?.total}, BP=${prevMetrics?.heart?.bp_sys}/${prevMetrics?.heart?.bp_dia}
+                    const prevMetrics = reports?.length > 1 ? (reports[0]?.date === structuredData?.date ? reports[1].metrics : reports[0].metrics) : null;
+                    prompt = `BASELINE NORMALIZATION: Briefly compare these health metrics and identify improvements or deviations from historical data:
+CURRENT: HbA1c=${structuredData?.metrics?.blood?.hba1c}, Cholesterol=${structuredData?.metrics?.cholesterol?.total}, BP=${structuredData?.metrics?.heart?.bp_sys}/${structuredData?.metrics?.heart?.bp_dia}
+HISTORICAL NORMAL: HbA1c=${prevMetrics?.blood?.hba1c}, Cholesterol=${prevMetrics?.cholesterol?.total}, BP=${prevMetrics?.heart?.bp_sys}/${prevMetrics?.heart?.bp_dia}
 
-List 2-3 key changes using "Improved:" or "Failure:" labels. Be concise.`;
+List 2-3 key changes using "Improved:" or "Deviation:" labels. Link findings across body systems where applicable.`;
                 } else {
-                    prompt = `You are a medical assistant performing a ${mode.toUpperCase()} analysis.\n\nINSTRUCTIONS:\n${promptConfigs[mode]}\n\nReport Text:\n"${text}"`;
+                    prompt = `UNIFIED MEDICAL INTELLIGENCE WORKFLOW: You are analyzing a medical report.\n\nMODE: ${mode.toUpperCase()}\nOBJECTIVE: ${promptConfigs[mode]}\n\nReport Text:\n"${text}"`;
                 }
 
                 let result = "";
@@ -136,7 +147,6 @@ List 2-3 key changes using "Improved:" or "Failure:" labels. Be concise.`;
                     result = await generateOllamaResponse(prompt, settings.ollamaModel, settings.ollamaUrl, getAILanguageInstruction());
                 }
 
-                console.log(`✅ ${mode} analysis complete`);
                 setModeAnalyses(prev => ({ ...prev, [mode]: result }));
                 if (mode === activeTab) setAnalysis(result);
             } catch (err) {
@@ -153,7 +163,6 @@ List 2-3 key changes using "Improved:" or "Failure:" labels. Be concise.`;
 
         try {
             await Promise.all(promises);
-            console.log("📊 Batch analysis complete");
         } catch (err) {
             setError(err.message);
         } finally {
@@ -162,9 +171,11 @@ List 2-3 key changes using "Improved:" or "Failure:" labels. Be concise.`;
     };
 
     const comparisonData = useMemo(() => {
-        if (!reports || reports.length < 2 || !structuredData) return null;
+        if (!reports || reports.length < 1 || !structuredData) return null;
         const current = structuredData.metrics;
-        const previous = reports[0]?.date === structuredData.date ? reports[1]?.metrics : reports[0]?.metrics;
+        // Correct history lookup (skip the current report if it was just saved)
+        const previous = reports.find(r => r.date !== structuredData.date)?.metrics || (reports.length > 1 ? reports[1].metrics : null);
+
         if (!previous) return null;
 
         const getDelta = (curr, prev) => {
@@ -183,9 +194,9 @@ List 2-3 key changes using "Improved:" or "Failure:" labels. Be concise.`;
             let status = 'stable';
             if (Math.abs(parseFloat(delta.percent)) > 1) {
                 if (type === 'lower_is_better') {
-                    status = cVal < pVal ? 'improved' : 'failed';
+                    status = cVal < pVal ? 'improved' : 'deviation';
                 } else {
-                    status = cVal > pVal ? 'improved' : 'failed';
+                    status = cVal > pVal ? 'improved' : 'deviation';
                 }
             }
             return { label: subKey.replace('_', ' ').toUpperCase(), current: cVal, previous: pVal, delta, status };
@@ -210,7 +221,7 @@ List 2-3 key changes using "Improved:" or "Failure:" labels. Be concise.`;
         { id: 'brief', label: 'Brief', icon: Zap },
         { id: 'simple', label: 'Simple', icon: List },
         { id: 'detailed', label: 'Detailed', icon: Microscope },
-        { id: 'changes', label: 'What Changed', icon: GitCompare }
+        { id: 'changes', label: 'Historical Baseline', icon: GitCompare }
     ];
 
     return (
@@ -223,6 +234,30 @@ List 2-3 key changes using "Improved:" or "Failure:" labels. Be concise.`;
             contain: 'layout'
         }}>
             <style>{markdownStyles}</style>
+
+            {/* Step 2 & 3: Scan Quality Warning */}
+            {ocrConfidence !== null && ocrConfidence < 60 && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{
+                        padding: '1rem',
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid #ef4444',
+                        borderRadius: '10px',
+                        marginBottom: '1.5rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        color: '#fca5a5',
+                        fontSize: '0.9rem'
+                    }}
+                >
+                    <RefreshCw size={18} className="text-error" />
+                    <strong>Quality Alert (Feature 3):</strong> Accuracy of extraction may be affected due to blurry scan (Confidence: {Math.round(ocrConfidence)}%). Please cross-verify metrics manually.
+                </motion.div>
+            )}
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                     {tabs.map(tab => (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Send, Mic, MicOff, Volume2, Sparkles, User, Bot, VolumeX } from 'lucide-react';
 import { generateGeminiResponse } from '../services/gemini';
 import { saveChatMessage, getChatHistory } from '../services/database';
@@ -8,12 +8,18 @@ import { useVoiceCommand } from '../context/VoiceCommandContext';
 import { useVoice } from '../context/VoiceContext';
 import { useLanguage } from '../context/LanguageContext';
 
-const ChatAssistant = ({ context, analysis, settings }) => {
+const ChatAssistant = ({ context, analysis, settings, reports }) => {
     const { t, getAILanguageInstruction } = useLanguage();
     const { user } = useAuth();
 
+    // Step 10: Persistent Context Memory - Fetching historical context
+    const historicalContextBrief = useMemo(() => {
+        if (!reports || reports.length < 2) return "No previous medical reports available.";
+        return reports.slice(1, 4).map(r => `Date: ${r.date}, Summary: ${r.summary}`).join(' | ');
+    }, [reports]);
+
     const [messages, setMessages] = useState([
-        { role: 'model', content: t('chatAssistant') + ". " + (t('language') === 'भाषा' ? 'नमस्ते! मैं आपका मेडिकल असिस्टेंट हूँ। आप मुझसे अपनी रिपोर्ट के बारे में सवाल पूछ सकते हैं।' : t('language') === 'மொழி' ? 'வணக்கம்! நான் உங்கள் மருத்துவ உதவியாளர். உங்கள் அறிக்கையைப் பற்றி என்னிடம் கேள்விகளைக் கேட்கலாம்.' : "Hi! I'm your medical assistant. You can ask me questions about your report.") }
+        { role: 'model', content: t('chatAssistant') + ". " + (t('language') === 'भाषा' ? 'नमस्ते! मैं आपका मेडिकल असिस्टेंट हूँ। आप मुझसे अपनी रिपोर्ट या मेडिकल हिस्ट्री के बारे में सवाल पूछ सकते हैं।' : t('language') === 'மொழி' ? 'வணக்கம்! நான் உங்கள் மருத்துவ உதவியாளர். உங்கள் அறிக்கை அல்லது மருத்துவ வரலாறு பற்றி என்னிடம் கேள்விகளைக் கேட்கலாம்.' : "Hi! I'm your medical assistant. You can ask me questions about your current report or historical health trends.") }
     ]);
 
     // Load History
@@ -111,32 +117,36 @@ const ChatAssistant = ({ context, analysis, settings }) => {
 
         try {
             // Create context prompt with larger substring limit
-            const systemContext = context ? context.substring(0, 5000) : 'No report data available.';
-            const analysisContext = analysis ? analysis.substring(0, 2000) : 'No previous analysis available.';
+            const systemContext = context ? context.substring(0, 5000) : 'No current report data.';
+            const analysisContext = analysis ? analysis.substring(0, 2000) : 'No analysis summary yet.';
 
             const fullPrompt = `
-        You are a specialized Medical Report Assistant.
+        UNIFIED MEDICAL INTELLIGENCE - PHASE 4: PERSISTENT ENGAGEMENT
+        You are a medical intelligence assistant supporting the "Unified Layer" between labs and clinical consultation.
         
-        REPORT DATA (OCR Extracted):
+        CURRENT REPORT DATA:
         "${systemContext}"
         
-        PREVIOUS ANALYSIS SUMMARY:
+        CURRENT ANALYSIS:
         "${analysisContext}"
+        
+        HISTORICAL TREND CONTEXT (Step 10):
+        "${historicalContextBrief}"
         
         USER QUESTION: 
         "${questionToSend}"
         
         INSTRUCTIONS:
-        1. Use the provided REPORT DATA to answer the USER QUESTION.
-        2. If the data is missing or "No report data available", explain that and ask the user to upload a report first.
-        3. Keep answers concise, empathetic, and professional.
-        4. MANDATORY SAFETY: If the user asks for a diagnosis or treatment, state that you are an AI and they MUST consult a qualified physician.
+        1. PERSISTENT CONTEXT: Use Current, Analytical, and Historical data to provide a longitudinal answer.
+        2. STEP 9 - SAFETY: I cannot provide prescriptions or drug dosages. If asked, refer them to a doctor.
+        3. STEP 7 - TRANSPARENCY: Explain findings based on WHO/ADA evidence if relevant.
+        4. EMPATHY: Be professional but highly empathetic ("I understand...", "It's common...").
+        5. GOVERNANCE: Always add a subtle reminder that this info is to aid their next doctor's visit.
       `;
 
-            // Pass language instruction for multilingual response
             const responseText = await generateGeminiResponse(
                 settings.geminiKey,
-                messages, // Pass full conversation history
+                messages, // Pass conversation history
                 fullPrompt,
                 context || "",
                 getAILanguageInstruction()
