@@ -38,7 +38,7 @@ function AppContent() {
 
   // Settings State
   const [settings, setSettings] = useState({
-    geminiKey: '',
+    geminiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
     ollamaModel: 'llama3',
     ollamaUrl: 'http://localhost:11434'
   });

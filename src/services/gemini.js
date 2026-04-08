@@ -4,7 +4,7 @@ export const generateGeminiResponse = async (apiKey, history, message, context, 
     if (!apiKey) throw new Error("Gemini API Key is missing. Please add it in settings.");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const chat = model.startChat({
         history: history.map(h => ({
