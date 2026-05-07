@@ -2,7 +2,7 @@
 
 # DATAQUEST / Hackathon Edition
 
-<div align="center">
+<div align="center"> 
 
 ![MediScan AI](https://img.shields.io/badge/MediScan%20AI-Accessible%20Healthcare-blueviolet?style=for-the-badge\&logo=health\&logoColor=white)
 
