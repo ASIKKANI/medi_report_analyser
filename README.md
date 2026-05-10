@@ -14,7 +14,7 @@
 [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%20Inspired-brightgreen?style=flat-square)](#)
 
 *Turning complex medical reports into clear, visual, and narratable health stories*
-
+   
 </div>
 
 ---
